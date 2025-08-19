@@ -3,10 +3,10 @@ from openvino.runtime import serialize
 import os
 
 # Convert model từ ONNX sang OpenVINO IR (FP16)
-model = convert_model(input_model="yolov8n.onnx", compress_to_fp16=True)
+model = convert_model(input_model="yolov10n.onnx", compress_to_fp16=True)
 
 # Serialize: lưu model ra file XML + BIN
-os.makedirs("openvino_model", exist_ok=True)
-serialize(model, "openvino_model/yolov8n_fp16.xml", "openvino_model/yolov8n_fp16.bin")
+os.makedirs("openvino_model_yolov10", exist_ok=True)
+serialize(model, "openvino_model_yolov10/yolov10n_fp16.xml", "openvino_model_yolov10/yolov10n_fp16.bin")
 
 print("✅ Đã convert và lưu model OpenVINO FP16.")

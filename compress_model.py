@@ -5,7 +5,7 @@ import os
 
 # === Load model ===
 core = Core()
-model = core.read_model("openvino_model/yolov8n_fp16.xml")
+model = core.read_model("openvino_model_320/yolov5nu_fp16.xml")
 input_layer = model.input(0)
 input_name = input_layer.get_any_name()
 
@@ -13,7 +13,7 @@ input_name = input_layer.get_any_name()
 shape = [1, 3, 320, 320]  # hoặc lấy từ input_layer.partial_shape
 
 # === Generate random data ===
-num_samples = 10
+num_samples = 50
 data = [np.random.rand(*shape).astype(np.float32) for _ in range(num_samples)]
 
 # === Create NNCF Dataset wrapper ===
@@ -26,9 +26,9 @@ nncf_dataset = Dataset(data, preprocess_fn)
 quantized_model = quantize(model, nncf_dataset)
 
 # === Save model ===
-os.makedirs("openvino_model_int8", exist_ok=True)
+os.makedirs("openvino_model_320", exist_ok=True)
 serialize(quantized_model,
-          "openvino_model_int8/yolov8n_int8.xml",
-          "openvino_model_int8/yolov8n_int8.bin")
+          "openvino_model_320/yolov5nu_int8.xml",
+          "openvino_model_320/yolov5nu_int8.bin")
 
 print("✅ Đã quantize với NNCF Dataset wrapper.")

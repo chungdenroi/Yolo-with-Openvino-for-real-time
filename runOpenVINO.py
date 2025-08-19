@@ -4,13 +4,18 @@ import time
 from openvino.runtime import Core
 
 # ==== CONFIG ====
-model_path = "openvino_model_int8/yolov8n_int8.xml"
+# model_path = "openvino_model_int8/yolov8n_int8.xml"
+model_path = "openvino_model/yolov8n_fp16.xml"
+# model_path = "openvino_model_640_int8/yolov8n_int8.xml"
+# model_path = "openvino_model_320/yolov5nu_fp16.xml"
+# model_path = "openvino_model_320/yolov5nu_int8.xml"
+model_path = "openvino_model_yolov10/yolov10n_fp16.xml"
 input_size = 320  # Resize ảnh đầu vào giống khi export
 
 # ==== LOAD OPENVINO MODEL ====
 core = Core()
 model = core.read_model(model_path)
-compiled_model = core.compile_model(model, "GPU")
+compiled_model = core.compile_model(model, "CPU")
 
 input_layer = compiled_model.input(0)
 input_name = input_layer.get_any_name()
@@ -50,7 +55,7 @@ def main(video_source=0):
         ret, frame = cap.read()
         if not ret:
             break
-        # st_time = time.time()
+        st_time = time.time()
         input_tensor, w_orig, h_orig = preprocess(frame, input_size)
 
         # Inference
@@ -72,7 +77,7 @@ def main(video_source=0):
 
         frame_count += 1
         elapsed_time = time.time() - start_time
-        # print(f"Tacttime: {(time.time()-st_time)*1000} ms")
+        print(f"Tacttime: {(time.time()-st_time)*1000} ms")
 
         if elapsed_time >= 1.0:
             fps = frame_count / elapsed_time

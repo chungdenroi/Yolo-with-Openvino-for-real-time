@@ -4,7 +4,7 @@ import onnxruntime as ort
 import time
 
 # Config
-onnx_model_path = "yolov8n.onnx"
+onnx_model_path = "yolov10n.onnx"
 input_size = 320  # Kích thước model ONNX xuất (resize ảnh đầu vào)
 
 # Load model
@@ -70,4 +70,4 @@ def main(video_source=0):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    main("people2.avi")  # hoặc main("video.mp4") nếu muốn chạy file video
+    main(0)  # hoặc main("video.mp4") nếu muốn chạy file video
