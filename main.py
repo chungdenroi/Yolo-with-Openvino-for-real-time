@@ -6,7 +6,7 @@ from short import Sort
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
 
-    model = YOLO("yolov10n.pt")
+    model = YOLO("yolo11n.pt")
 
     tracker = Sort()
 

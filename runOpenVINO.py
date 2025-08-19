@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time
 from openvino.runtime import Core
+from  short import  Sort
 
 # ==== CONFIG ====
 # model_path = "openvino_model_int8/yolov8n_int8.xml"
@@ -9,16 +10,19 @@ model_path = "openvino_model/yolov8n_fp16.xml"
 # model_path = "openvino_model_640_int8/yolov8n_int8.xml"
 # model_path = "openvino_model_320/yolov5nu_fp16.xml"
 # model_path = "openvino_model_320/yolov5nu_int8.xml"
-model_path = "openvino_model_yolov10/yolov10n_fp16.xml"
+# model_path = "openvino_model_yolov10/yolov10n_fp16.xml"
+model_path = "openvino_model_yolov11/yolo11n_fp16.xml"
 input_size = 320  # Resize ảnh đầu vào giống khi export
 
 # ==== LOAD OPENVINO MODEL ====
 core = Core()
 model = core.read_model(model_path)
-compiled_model = core.compile_model(model, "CPU")
+compiled_model = core.compile_model(model, "GPU")
 
 input_layer = compiled_model.input(0)
 input_name = input_layer.get_any_name()
+
+tracker = Sort()
 
 # ==== PREPROCESS ====
 def preprocess(frame, size):
@@ -61,7 +65,7 @@ def main(video_source=0):
         # Inference
         results = compiled_model({input_name: input_tensor})  # Dict[str: np.ndarray]
         detections = list(results.values())[0]  # shape: [1, N, 6]
-
+        detections_list = []
         for det in detections[0]:  # batch dim = 1
             x1, y1, x2, y2, conf, cls_id = det
             if conf < 0.3:
@@ -69,11 +73,22 @@ def main(video_source=0):
 
             x1, y1, x2, y2 = scale_coords([x1, y1, x2, y2], w_orig, h_orig, input_size)
             cls_id = int(cls_id)
+            detections_list.append([x1, y1, x2, y2, conf])
 
-            label = f"{cls_id}:{conf:.2f}"
+            # label = f"{cls_id}:{conf:.2f}"
+            # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            # cv2.putText(frame, label, (x1, max(15, y1-5)),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+        if detections_list:
+            dets = np.array(detections_list)
+        else:
+            dets = np.zeros((0, 5))
+
+        tracks = tracker.update(dets)
+        for x1, y1, x2, y2, track_id in tracks.astype(int):
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(frame, label, (x1, max(15, y1-5)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+            cv2.putText(frame, f"ID {track_id}", (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
         frame_count += 1
         elapsed_time = time.time() - start_time

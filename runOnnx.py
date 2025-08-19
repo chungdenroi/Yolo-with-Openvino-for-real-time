@@ -4,7 +4,7 @@ import onnxruntime as ort
 import time
 
 # Config
-onnx_model_path = "yolov10n.onnx"
+onnx_model_path = "yolo11n.onnx"
 input_size = 320  # Kích thước model ONNX xuất (resize ảnh đầu vào)
 
 # Load model
