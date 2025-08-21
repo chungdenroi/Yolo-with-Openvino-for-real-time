@@ -12,12 +12,14 @@ model_path = "openvino_model/yolov8n_fp16.xml"
 # model_path = "openvino_model_320/yolov5nu_int8.xml"
 # model_path = "openvino_model_yolov10/yolov10n_fp16.xml"
 model_path = "openvino_model_yolov11/yolo11n_fp16.xml"
+model_path = "yolov5nu_int8_openvino_model/yolov5nu.xml"
+model_path = "yolo11n_int8_openvino_model/yolo11n.xml"
 input_size = 320  # Resize ảnh đầu vào giống khi export
 
 # ==== LOAD OPENVINO MODEL ====
 core = Core()
 model = core.read_model(model_path)
-compiled_model = core.compile_model(model, "GPU")
+compiled_model = core.compile_model(model, "CPU")
 
 input_layer = compiled_model.input(0)
 input_name = input_layer.get_any_name()
